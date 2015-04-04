@@ -1,10 +1,5 @@
 package build1;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 /**
  * An algorithm for solving 3 x 4 sliding tile puzzles
  * It takes a string on the main argument in the style xxxxxxxxxxxx2xxxxxxxxxxxx.txt
