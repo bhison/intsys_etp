@@ -1,0 +1,149 @@
+		dcdab_bddabd2dcddbadbdb_a.txt
+        ddabb_dcdabd2_cbaddabbddd.txt
+        bdbdbaadcd_d2_bdbbcaadddd.txt
+        dbdaddcabd_b2dbdbdcadbd_a.txt
+        dadabbc_ddbd2daacbddb_bdd.txt
+        abddcdabdd_b2ab_ddbabcddd.txt
+        dbbdcadb_dad2_bddacdbdbad.txt
+        dbddb_caaddb2dcbbb_ddadad.txt
+        dbddabdabc_d2dcbbadadbd_d.txt
+        cdbaddbdda_b2cdbbdaa_ddbd.txt
+        ddbda_bdcdba2dbdbd_dbacad.txt
+        bbdaa_bdcddd2_abbbdadcddd.txt
+        ddcdbbd_adba2bdcabdd_addb.txt
+        bcddb_aadddb2babcbdd_ddad.txt
+        abdcdddd_bab2dadcbbba_ddd.txt
+        baddd_adbcdb2baddacdbbd_d.txt
+        
+  		==============================================================================================================================
+        ///LECTURE ONE CODE SNIPPETS
+		==============================================================================================================================               
+
+        >>>>>>>>>>>>DEPTH FIRST LIMITED SEARCH
+        private LinkedList<Town> depthFirst(Town start, Town dest, int depth) {
+        	if (depth == 0) return null;
+			else if (start.equals(dest))
+			{	LinkedList<Town> route = new LinkedList<Town>(); 
+				route.add(dest); // construct singleton route
+				return route;	
+			}
+			else 
+			{	LinkedList<Town> nextTowns = graph.get(start); 
+				for (Town next:nextTowns) // search top-down
+				{	LinkedList<Town> route = depthFirst(next, dest, depth - 1);
+					if (route != null)
+					{	route.addFirst(start);
+						return route;	
+					}
+				}
+			return null; 
+			}
+		}
+		
+		>>>>>>>>>>>>ITERATIVE DEEPENING
+		private LinkedList<Town> iterativeDeepening(Town start, Town dest)
+		{
+			for (int depth = 1; true; depth++) // doubtful termination
+			{
+				LinkedList<Town> route = depthFirst(start, dest, depth);
+				if (route != null) return route; // fast exit
+			}
+		}
+		
+		>>>>>>>>>>>>DEPTH LIMITED WITHOUT REPETITION
+		private LinkedList<Town> depthFirstDevaVu(LinkedList<Town> route, Town dest, int depth)
+￼		{
+			if (depth == 0) return null;
+			Town last = route.getLast();
+			if (last.equals(dest)) return route; 
+			else
+			{
+				LinkedList<Town> nextTowns = graph.get(last);
+				for (Town next:nextTowns)
+				{
+					if (!route.contains(next))
+					{
+						LinkedList<Town> nextRoute = (LinkedList<Town>) route.clone();
+						nextRoute.add(next);
+						LinkedList<Town> wholeRoute =
+							depthFirstDevaVu(nextRoute, dest, depth - 1); 
+						if (wholeRoute != null) return wholeRoute;
+					}
+				}
+			}
+		}
+		
+		==============================================================================================================================
+		///LECTURE TWO CODE SNIPPETS
+		==============================================================================================================================
+
+		>>>>>>>>>>>>NEXT CONFIGS
+		private LinkedList<String> nextConfigs(String config) 
+		{ // 1
+			String[] wheels = new String[2];
+			wheels[0] = config.substring(0, wheel);
+			wheels[1] = config.substring(wheel); LinkedList<String> result = new LinkedList<String>(); for (int i = 0; i < 2; i++)
+			{ //2
+				for (int j = 1; j < wheel; j++) 
+					{ // 3
+						char[] shiftedWheel = new char[wheel]; for (int k = 0; k < wheel; k++)
+						shiftedWheel[k] = wheels[i].charAt((k+j) % wheel); 
+						String nextConfig;
+						
+						if (i == 0)
+							nextConfig = String.copyValueOf(shiftedWheel) +
+								shiftedWheel[0] +
+								wheels[1].substring(1, blueRed + 1) +
+								shiftedWheel[blueRed + 1] +
+								wheels[1].substring(blueRed + 2);
+						else
+							nextConfig = shiftedWheel[0] +
+											wheels[0].substring(1, blueRed + 1) +
+											shiftedWheel[blueRed + 1] +
+											wheels[0].substring(blueRed + 2) +
+											String.copyValueOf(shiftedWheel);
+						if (!config.equals(nextConfig) && !result.contains(nextConfig)) 
+							result.add(nextConfig);
+					} // 3 
+			} // 2
+		return result; } // 1
+		
+		>>>>>>>>>>>>DEPTH-FIRST (LIMITED)
+		private LinkedList<String> depthFirst(String start, String dest, int depth) 
+		{ // 1
+			if (depth == 0) return null; else if (start.equals(dest))
+			{
+				LinkedList<String> route = new LinkedList<String>(); route.add(start);
+				return route;
+			} 
+			else
+			{
+				LinkedList<String> result = nextConfigs(start); 
+				for (String nextConfig:result)
+				{
+					LinkedList<String> route = depthFirst(nextConfig, dest, depth - 1);
+					if (route != null)
+					{
+						route.addFirst(start);
+						return route; 
+					}
+				}
+				return null; 
+			}
+		} // 1
+		
+		>>>>>>>>>>>>ITERATIVE DEEPENING
+		public LinkedList<String> iterativeDeepening(String start, String dest)
+		{
+			for (int depth = 1; true; depth++)
+			{
+				System.out.println(depth);
+				LinkedList<String> route = depthFirst(start, dest, depth);
+				if (route != null) return route;
+			} 
+		}
+		
+		>>>>>>>>>>>>TRIPLE CLASS		
+		
+
+												
