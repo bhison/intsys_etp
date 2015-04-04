@@ -38,7 +38,7 @@
 					return route;	
 				}
 			}
-		return null; 
+			return null; 
 		}
 	}
 		
@@ -87,10 +87,10 @@
 		{ //2
 			for (int j = 1; j < wheel; j++) 
 			{ // 3
-				char[] shiftedWheel = new char[wheel]; for (int k = 0; k < wheel; k++)
-				shiftedWheel[k] = wheels[i].charAt((k+j) % wheel); 
+				char[] shiftedWheel = new char[wheel]; 
+				for (int k = 0; k < wheel; k++)
+					shiftedWheel[k] = wheels[i].charAt((k+j) % wheel); 
 				String nextConfig;
-				
 				if (i == 0)
 					nextConfig = String.copyValueOf(shiftedWheel) +
 						shiftedWheel[0] +
@@ -115,7 +115,8 @@
 	{ // 1
 		if (depth == 0) return null; else if (start.equals(dest))
 		{
-			LinkedList<String> route = new LinkedList<String>(); route.add(start);
+			LinkedList<String> route = new LinkedList<String>(); 
+			route.add(start);
 			return route;
 		} 
 		else
