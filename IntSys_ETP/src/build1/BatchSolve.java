@@ -1,5 +1,6 @@
 package build1;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,20 +11,33 @@ public class BatchSolve {
 	public BatchSolve(String[] args)
 	{	
 		List<String> puzzles;
-		String puzzleWidth = null;
-		if(args.length > 1) puzzleWidth = args[1];
 		try {
 			puzzles = Files.readAllLines(Paths.get(args[0]), StandardCharsets.US_ASCII);
-			System.out.println("loadDat: Data loaded internally");
+			System.out.println("BATCH: puzzles loaded internally");
 			for(String puzzle : puzzles)
-				System.out.println(puzzle);
-			for(String puzzle : puzzles)
-			{	String[] a;
+			{	System.out.println(puzzle);
+				String[] a;
+				
+//				File f = new File(puzzle);
+//				if(!f.exists())
+//				{	if(args.length > 1)
+//						a = new String[]{ puzzle, args[1] };
+//					else
+//					{	a = new String[]{ puzzle };
+//						System.out.println(puzzle + " - begin calculation");
+//					}
+//					new Main(a);
+//				} else {
+//					System.out.println(puzzle + " - skipped; file exists already");
+//				}
+				
 				if(args.length > 1)
-					a = new String[]{ puzzle, args[1] };
+						a = new String[]{ puzzle, args[1] };
 				else
-					a = new String[]{ puzzle };
-				new Main(a);			
+				{	a = new String[]{ puzzle };
+						System.out.println(puzzle + " - begin calculation");
+				}
+					new Main(a);
 			}
 		}
 		catch (IOException e) {

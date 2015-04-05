@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 public class Main 
 {
@@ -11,7 +12,7 @@ public class Main
 	private int gameWidth;
 	private int gameHeight;
 	
-	private static final boolean OUTPUT_TO_CONSOLE = false; //Set this to false to output as files
+	private static final boolean OUTPUT_TO_CONSOLE = true; //Set this to false to output as files
 	
 	//public Main(String puzzleString, int gameWidth)
 	public Main(String[] args)
@@ -29,20 +30,11 @@ public class Main
 		System.out.println("Puzzle string is: " + puzzleString);
 		System.out.println("start set to: " + new String(start));
 		System.out.println("target set to: " + new String(target));
-		LinkedList<char[]> solutionPath = iterativeDeepening(start,target);
+		LinkedList<char[]> solutionPath = uniformCost(start,target);
 		if(solutionPath == null) System.out.println("ERROR: Something went wrong! No solution found!");
 		else 
 		{	try	{ createSolutionFile(puzzleString, solutionPath, OUTPUT_TO_CONSOLE); }
 			catch(IOException e) { System.out.println(e); }
-		}
-	}
-	
-	private LinkedList<char[]> iterativeDeepening(char[] start, char[] dest)
-	{	for (int depth = 1; true; depth++) // doubtful termination
-		{	System.out.println("******************************************** DEPTH = " + depth + " *******");
-			LinkedList<char[]> route = new LinkedList<char[]>(Arrays.asList(start));
-			route = depthFirst(route, dest, depth);
-			if (route != null) return route; // fast exit
 		}
 	}
 	
@@ -65,7 +57,48 @@ public class Main
 //			return null; 
 //		}
 //    }
-    
+	
+	/**
+	 * TODO: Get this to operate correctly. Create "actualDistance" method then link it in as
+	 * main solution method.
+	 * @param start
+	 * @param dest
+	 * @return
+	 */
+	private LinkedList<char[]> uniformCost(char[] start, char[] target)
+	{	LinkedList<char[]> route = new LinkedList<char[]>(); 
+		route.add(start);
+		PriorityQueue pairs = new PriorityQueue();
+		pairs.add(new Pair(0.0, route)); // uniform-cost
+//		pairs.add(new Pair(estimateDistance(start, target), route)); // best 
+		while (true)
+		{	//System.out.println(pairs); 		// debug traces
+			if (pairs.size() == 0) return null;		// no solutions exist
+			Pair pair = (Pair) pairs.poll(); 		// retrieve and remove (log)
+			route = pair.getRoute();
+			char[] last = route.getLast();
+			if (new String(last).equals(new String(target))) return route;
+			LinkedList<char[]> nextConfigs = getAdjacencies(last);//graph.get(last);
+			for (char[] next : nextConfigs)
+			{	if (!route.contains(next))	//deja vu
+				{	LinkedList<char[]> nextRoute = new LinkedList<char[]>(route); 
+					nextRoute.addLast(next);	
+					int distance = nextRoute.size(); // uniform 
+	//				double distance = estimateDistance(next, target); // best-first 
+					pairs.add(new Pair(distance, nextRoute)); // log too
+				}
+			}
+		}
+	}
+	
+	private LinkedList<char[]> iterativeDeepening(char[] start, char[] dest)
+	{	for (int depth = 1; true; depth++) // doubtful termination
+		{	System.out.println("******************************************** DEPTH = " + depth + " *******");
+			LinkedList<char[]> route = new LinkedList<char[]>(Arrays.asList(start));
+			route = depthFirst(route, dest, depth);
+			if (route != null) return route; // fast exit
+		}
+	}
     
 	private LinkedList<char[]> depthFirst(LinkedList<char[]> route, char[] dest, int depth)
     {  	if (depth == 0) return null;
