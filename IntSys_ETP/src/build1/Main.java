@@ -2,8 +2,9 @@ package build1;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Main 
@@ -46,7 +47,10 @@ public class Main
 	 * @return
 	 */
 	private LinkedList<String> uniformCost(String start, String target)
-	{	LinkedList<String> allCalculated = new LinkedList<String>();
+	{	Map<Integer, LinkedList<String>> allCalculated = new HashMap<Integer, LinkedList<String>>();
+		for(int i = 0; i < start.length(); i++)
+			allCalculated.put(i, new LinkedList<String>());
+		
 		LinkedList<String> route = new LinkedList<String>(); 
 		route.add(start);
 		PriorityQueue pairs = new PriorityQueue();
@@ -61,8 +65,10 @@ public class Main
 			if (last.equals(target)) return route;
 			LinkedList<String> nextConfigs = getAdjacencies(last);//graph.get(last);
 			for (String next : nextConfigs)
-			{	if (!allCalculated.contains(next))	//deja vu
-				{	allCalculated.add(next);
+			{	if (route.contains(next)) ; //deja vu by route;
+				else if(allCalculated.get(next.indexOf('_')).contains(next)) ; //deja vu by gap/all calculated
+				else
+				{	allCalculated.get(next.indexOf('_')).add(next);
 					LinkedList<String> nextRoute = new LinkedList<String>(route); 
 					nextRoute.addLast(next);	
 					int distance = nextRoute.size(); // uniform 
