@@ -6,19 +6,19 @@ public class Pair implements Comparable<Pair>
 {
 	
 	private double rank;
-	private LinkedList<char[]> route;
+	private LinkedList<String> route;
+	
+	Pair(double rank, LinkedList<String> route)
+	{	this.rank = rank;
+		this.route = route; 
+	}
 	
 	public double getRank()
 	{	return rank;
 	}
 	
-	public LinkedList<char[]> getRoute()
+	public LinkedList<String> getRoute()
 	{	return route;
-	}
-	
-	Pair(double rank, LinkedList<char[]> route)
-	{	this.rank = rank;
-		this.route = route; 
 	}
 	
 	public int compareTo(Pair pair)
