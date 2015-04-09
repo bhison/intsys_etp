@@ -8,7 +8,7 @@ public class Pair implements Comparable<Pair>
 	private double rank;
 	private LinkedList<String> route;
 	
-	Pair(double rank, LinkedList<String> route)
+	Pair(int rank, LinkedList<String> route)
 	{	this.rank = rank;
 		this.route = route; 
 	}
