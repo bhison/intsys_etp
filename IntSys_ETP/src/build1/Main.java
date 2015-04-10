@@ -17,7 +17,7 @@ public class Main
 	int depth = 0; //Counts the current depth of search for console output
 	
 	private static final int DEFAULT_GAME_WIDTH = 3; // Unless parameter passed  on startup, this is the row width
-	private static final boolean OUTPUT_TO_CONSOLE = false; //Set this to false to output as files
+	private static final boolean OUTPUT_TO_CONSOLE = true; //Set this to false to output as files
 	private static final boolean USE_HEURISTIC = true; //True - use best first; False - use uniform cost
 	
 	/**
@@ -35,7 +35,7 @@ public class Main
 		String start = puzzleString.substring(0, puzzleSize);
 		String target = puzzleString.substring(puzzleSize + 1, puzzleSize * 2 + 1);
 		LinkedList<String> solutionPath;
-		solutionPath = USE_HEURISTIC ? bestFirst(start, target) : uniformCost(start,target);
+		solutionPath = USE_HEURISTIC ? aStar(start, target) : uniformCost(start,target);
 		
 		if(solutionPath == null) System.out.println("ERROR: Something went wrong! No solution found!");
 		else 
@@ -43,6 +43,45 @@ public class Main
 			catch(IOException e) { System.out.println(e); }
 		}
 		System.out.println("Puzzle finished");
+	}
+	
+	/**
+	 * 
+	 * @param start
+	 * @param target
+	 * @return
+	 */
+	private LinkedList<String> aStar(String start, String target)
+	{
+		LinkedList<String> route = new LinkedList<String>(); 
+		route.add(start);
+		PriorityQueue<Pair> pairs = new PriorityQueue<Pair>();
+		pairs.add(new Pair(estimateDistance(start, target), route)); // A*
+		
+		int round = 0;																// DELETE ME
+		while (true)
+		{	
+			//round++; System.out.println("Round: " +round); 							// DELETE ME
+			//System.out.println(pairs); //Debug traces 								// DELETE ME
+			//System.out.println(pairs.size());											// DELETE ME
+			if(pairs.size() == 0) return null;  // no solutions exist
+			Pair pair = (Pair) pairs.poll(); // retrieve and remove (log)
+			route = pair.getRoute();
+			String last = route.getLast();
+			if(last.equals(target)) return route; // exit loop with solution
+			LinkedList<String> nextConfigs = getAdjacencies(last);
+			//System.out.println(nextConfigs.size() + " adjacent configurations"); 		// DELETE ME
+			for(String next: nextConfigs)
+			{	if (route.contains(next)); // deja vu
+				else
+				{	LinkedList<String> nextRoute = new LinkedList<String>(route);
+					nextRoute.addLast(next);
+					int distance = nextRoute.size() + estimateDistance(next, target);
+					//System.out.println("Route size: " + nextRoute.size());			// DELETE ME
+					pairs.add(new Pair(distance, nextRoute));
+				}
+			}
+		}
 	}
 	
 	/**
@@ -55,24 +94,24 @@ public class Main
 	{	LinkedList<String> route = new LinkedList<String>(); 
 		route.add(start);
 		PriorityQueue<Pair> pairs = new PriorityQueue<Pair>();
-		pairs.add(new Pair(estimateDistance(start, target), route)); 
+		pairs.add(new Pair(estimateDistance(start, target), route)); 	
 		while (true)
-		{	if (pairs.size() == 0) return null;		// no solutions exist
+		{	
+			if (pairs.size() == 0) return null;		// no solutions exist
 			Pair pair = (Pair) pairs.poll(); 		// retrieve and remove (log)
 			route = pair.getRoute();
 			String last = route.getLast();
 			if (last.equals(target)) return route;
 			LinkedList<String> nextConfigs = getAdjacencies(last);
+			
+			
+			
 			for (String next : nextConfigs)
-			{	if (route.contains(next)) ; //deja vu by route only;
+			{	if (route.contains(next)) ; //Do nothing - deja vu check by route;
 				else
 				{	LinkedList<String> nextRoute = new LinkedList<String>(route); 
-					nextRoute.addLast(next);	
-					int distance = estimateDistance(next, target); // best-first 
-					if(nextRoute.size() > depth)
-					{	depth = nextRoute.size();
-						System.out.println("New Depth = " + depth);
-					}
+					nextRoute.addLast(next);	 
+					int distance = estimateDistance(next, target); // best-first
 					pairs.add(new Pair(distance, nextRoute)); // log too
 				}
 			}
@@ -88,7 +127,8 @@ public class Main
 	public int estimateDistance(String current, String target)
 	{	LinkedList<Integer> tilesOutOfPlace = new LinkedList<Integer>();		
 		for(int i = 0; i < current.length(); i++)
-			if(current.charAt(i) == target.charAt(i)) ; //Do nothing
+			if(current.charAt(i) == '_') ; // Do not calculate distance for gap
+			else if(current.charAt(i) == target.charAt(i)) ; //Do nothing
 			else tilesOutOfPlace.add(i);
 		int returnInt = 0;
 		for(Integer tileIndex : tilesOutOfPlace) //This is the top level iteration though all out of place chars
@@ -112,6 +152,7 @@ public class Main
 				}
 			}
 		}
+		//System.out.println("Manhatten Distance for current = " + current + ", target = " + target + " : " +returnInt);
 		return returnInt;
 	}
 	
