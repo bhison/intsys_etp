@@ -106,6 +106,7 @@ public class Main
 	 * tile in to it's nearest target space if no other tiles were on the game board.
 	 * This heuristic is admissible as it will always take more moves that what is returned
 	 * to reach a winning configuration.
+	 * 
 	 * @param current The configuration that needs to be checked for distance from target
 	 * @param target The overall target configuration for this puzzle
 	 * @return The Manhattan heuristic of theoretical minimum distance
@@ -143,6 +144,7 @@ public class Main
 	
 	/**
 	 * Gives a list of next distance level indexes of the game board, preventing duplicates in line with alreadyChecked list
+	 * 
 	 * @param indicesToCheck List of indices to get adjacent indices for
 	 * @param alreadyChecked List of indices which we don't need to check again
 	 * @return a list of index integers contained within the next distance tier
@@ -159,14 +161,71 @@ public class Main
 		}
 		return returnList;
 	}
+
+    /**
+     * Returns an index based on starting index and direction of move
+     * 
+     * @param startPositon The position moving from
+     * @param direction The direction to move in
+     * @return The resulting index
+     */
+    private int getIndexByDirection(int startPositon, String direction)
+    {	int tileIndex = startPositon;
+    	if(direction == "up") tileIndex += gameWidth;
+		else if(direction == "down") tileIndex -= gameWidth;
+		else if(direction == "left") tileIndex += 1;
+		else if(direction == "right") tileIndex -= 1;
+    	return tileIndex;
+    }	
 	
+	/**
+	 * Takes a position index and returns list of valid slides directions based on game dimensions
+	 * 
+	 * @param positionIndex The index you are checking for
+	 * @return List of valid slide directions
+	 */
+	private LinkedList<String> getValidMoveList(int positionIndex)
+	{	LinkedList<String> returnArray = new LinkedList<String>();
+		if(positionIndex < gameWidth); else returnArray.add("down");
+		if(positionIndex >= gameWidth * gameHeight - gameWidth); else returnArray.add("up");
+		int column = positionIndex % gameWidth;
+		if(column == 0); else returnArray.add("right");
+		if(column == gameWidth - 1); else returnArray.add("left");		
+		return returnArray;
+	}   
+
+	/**
+	 * Return all adjacent configurations from specified string configuration
+	 * 
+	 * @param stringConfig The configuration you want to check, as a simple string
+	 * @return A list of all possible configurations you can slide to
+	 */
+    private LinkedList<String> getAdjacencies(String stringConfig)
+    {	int gapIndex = stringConfig.indexOf('_');
+    	LinkedList<String> moveList = getValidMoveList(gapIndex);
+    	LinkedList<String> adjacencyList = new LinkedList<String>();
+    	for(String direction : moveList)
+    	{	int tileIndex = getIndexByDirection(gapIndex, direction);    		
+    		String tile = stringConfig.substring(tileIndex, tileIndex + 1);
+    		StringBuilder newConfig = new StringBuilder();
+    		for(int i = 0; i < stringConfig.length(); i++)
+    		{	if(i == gapIndex) newConfig.append(tile);
+    			else if(i == tileIndex) newConfig.append("_");
+    			else newConfig.append(stringConfig.charAt(i));
+    		}
+    		adjacencyList.add(new String(newConfig));
+    	}
+    	return adjacencyList;
+    }	
+    
 	/**
 	 * This is the Uniform Cost Search algorithm which can be used as an alternative to the above A* algorithm.
 	 * It is also reliable for giving optimal solutions to the puzzles however it takes a LOT longer. This has
 	 * however been slightly sped up by having a record of already calculated configurations, split by the gap
 	 * index of the config (probably my proudest invention of this project! Woo!).
 	 * Note: this algorithm is redundant unless the USE_HEURISTIC static value at the top of the class is set
-	 * to false
+	 * to false.
+	 * 
 	 * @param start The start configuration of the puzzle
 	 * @param target The target destination for the puzzle
 	 * @return A list of the optimal route of configurations between start and target
@@ -208,69 +267,16 @@ public class Main
 	}  
     
 	/**
-	 * 
-	 * @param stringConfig
-	 * @return
-	 */
-    private LinkedList<String> getAdjacencies(String stringConfig)
-    {	int gapIndex = stringConfig.indexOf('_');
-    	LinkedList<String> moveList = getValidMoveList(gapIndex);
-    	LinkedList<String> adjacencyList = new LinkedList<String>();
-    	for(String direction : moveList)
-    	{	int tileIndex = getIndexByDirection(gapIndex, direction);    		
-    		String tile = stringConfig.substring(tileIndex, tileIndex + 1);
-    		StringBuilder newConfig = new StringBuilder();
-    		for(int i = 0; i < stringConfig.length(); i++)
-    		{	if(i == gapIndex) newConfig.append(tile);
-    			else if(i == tileIndex) newConfig.append("_");
-    			else newConfig.append(stringConfig.charAt(i));
-    		}
-    		adjacencyList.add(new String(newConfig));
-    	}
-    	return adjacencyList;
-    }
-    
-    /**
-     * 
-     * @param startPositon
-     * @param direction
-     * @return
-     */
-    private int getIndexByDirection(int startPositon, String direction)
-    {	int tileIndex = startPositon;
-    	if(direction == "up") tileIndex += gameWidth;
-		else if(direction == "down") tileIndex -= gameWidth;
-		else if(direction == "left") tileIndex += 1;
-		else if(direction == "right") tileIndex -= 1;
-    	return tileIndex;
-    }
-	
-	/**
-	 * Takes a position index and returns list of valid slides based on game dimensions
-	 * @param gapIndex
-	 * @return List of valid slide directions
-	 */
-	private LinkedList<String> getValidMoveList(int positionIndex)
-	{	LinkedList<String> returnArray = new LinkedList<String>();
-		if(positionIndex < gameWidth); else returnArray.add("down");
-		if(positionIndex >= gameWidth * gameHeight - gameWidth); else returnArray.add("up");
-		int column = positionIndex % gameWidth;
-		if(column == 0); else returnArray.add("right");
-		if(column == gameWidth - 1); else returnArray.add("left");		
-		return returnArray;
-	}
-
-	/**
 	 * This is used when an optimal solution has been found. Depending on how the OUTPUT_TO_CONSOLE
 	 * variable is set, this will either output to a text file (overwriting any existing text file
 	 * by the same name) or simply print results to the console.
+	 * 
 	 * @param puzzleString The original puzzle string. If output is to file, this will be it's name.
 	 * @param stringSolutionPath The list of configurations the puzzle was solved via.
 	 * @throws IOException If there is a problem with the filewriter
 	 */
 	private void createSolutionFile(String puzzleString, LinkedList<String> stringSolutionPath) throws IOException
-	{	//TODO: Turn solution path in to LinkedList<char[]> or rewrite altogether
-		LinkedList<char[]> solutionPath = new LinkedList<char[]>();
+	{	LinkedList<char[]> solutionPath = new LinkedList<char[]>();
 		for(String s : stringSolutionPath)
 		{	solutionPath.add(s.toCharArray());			
 		}
@@ -294,6 +300,7 @@ public class Main
 	/**
 	 * The static main(String[] args) method. If the first parameter starts with 'batch'
 	 * request is sent to a batch object to call multiple instances of Main class.
+	 * 
 	 * @param args [0] - The filename (either a puzzle string or 'batch....txt'), [1] (optional) Custom game width
 	 */
 	public static void main(String[] args)
